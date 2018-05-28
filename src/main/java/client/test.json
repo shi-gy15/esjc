@@ -1,0 +1,19 @@
+{
+  "events" : [
+    {
+      "stream" : "newstream",
+      "type" : "select",
+      "data" : {
+        "row" : "id",
+        "max" : 1
+      }
+    },
+    {
+      "stream" : "newstream",
+      "type" : "delete",
+      "data" : {
+        "row" : "id"
+      }
+    }
+  ]
+}
