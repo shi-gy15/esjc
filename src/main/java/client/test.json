@@ -1,7 +1,7 @@
 {
   "events" : [
     {
-      "stream" : "newstream",
+      "stream" : "jsontest",
       "type" : "select",
       "data" : {
         "row" : "id",
@@ -9,7 +9,7 @@
       }
     },
     {
-      "stream" : "newstream",
+      "stream" : "jsontest",
       "type" : "delete",
       "data" : {
         "row" : "id"

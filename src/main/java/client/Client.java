@@ -26,9 +26,18 @@ public class Client {
 	private CompletableFuture<PersistentSubscription> subscription;
 	
 	public static void main(String[] args) throws Exception{
-		Client client = new Client();
 		
-		String filename = "D:\\Work\\2018Spring\\lab\\client\\esjc\\src\\main\\java\\client\\test.json";
+//		Client client = new Client("123.206.20.171", 1113);
+		Client client = new Client("127.0.0.1", 1113);
+		
+		// args[0]: test json filepath
+		if (args.length < 1) {
+			System.out.println("1 argument required(test json filepath).");
+			return;
+		}
+		String filename = args[0];
+		
+//		String filename = "D:\\Work\\2018Spring\\lab\\client\\esjc\\src\\main\\java\\client\\test.json";
 		List<EventData> lis = null;
 		String jsons = "jsontest";
 		String json = null, json2 = null;
@@ -40,7 +49,7 @@ public class Client {
 			throw e;
 		}
 		
-		client.deleteStream("jsontest", true);
+		client.deleteStream(jsons, true);
 		client.writeListToStream(jsons, lis, true);
 		json = ClientUtil.genGsonList(client.readStreamUsingType(jsons, "delete")).toString();
 		json2 = ClientUtil.genGsonList(client.readStreamAscend(jsons, true)).toString();
@@ -52,6 +61,9 @@ public class Client {
 		client.deletePersistentSubscription("jsontest", "local");
 		client.createPersistentSubscription("jsontest", "local");
 		client.subscribePersistent("jsontest", "local");
+		
+		System.out.println("Test finished");
+		return;
 	}
 	
 	Client() {
@@ -138,11 +150,15 @@ public class Client {
 
 	// API : Delete one stream
 	public void deleteStream(String stream, boolean sync) {
-        CompletableFuture<Void> future = eventstore.deleteStream(stream, ExpectedVersion.ANY)
-            .thenAccept(result -> System.out.println(result.logPosition));
-        if (sync) {
-            future.join();
-        }
+		try {
+			CompletableFuture<Void> future = eventstore.deleteStream(stream, ExpectedVersion.ANY)
+		            .thenAccept(result -> System.out.println(result.logPosition));
+			if (sync) {
+	            future.join();
+	        }
+		} catch (Exception e) {
+			System.out.println("Stream not existed.");
+		}
 	}
 	
 	// API : Create a persistent subscription of one stream(default sync)
@@ -167,7 +183,12 @@ public class Client {
 	
 	// API : Delete a persistent subscription of one stream(default sync)
 	public void deletePersistentSubscription(String stream, String group) {
-		eventstore.deletePersistentSubscription(stream, group).thenAccept(r -> System.out.println(r.status)).join();
+		try {
+			eventstore.deletePersistentSubscription(stream, group).thenAccept(r -> System.out.println(r.status)).join();
+		} catch (Exception e) {
+			System.out.println("Subscription not existed.");
+		}
+		
 	}
 	
 	// API : Subscribe to persistent subscription of one stream(default sync)
